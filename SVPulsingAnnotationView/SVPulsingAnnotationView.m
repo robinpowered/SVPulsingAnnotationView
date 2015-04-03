@@ -38,9 +38,9 @@
     if(self = [super initWithAnnotation:annotation reuseIdentifier:reuseIdentifier]) {
         self.layer.anchorPoint = CGPointMake(0.5, 0.5);
         self.calloutOffset = CGPointMake(0, 4);
-        self.bounds = CGRectMake(0, 0, 22, 22);
+        self.bounds = CGRectMake(0, 0, 14, 14);
         self.pulseScaleFactor = 5.3;
-        self.pulseAnimationDuration = 1.5;
+        self.pulseAnimationDuration = 1.3;
         self.outerPulseAnimationDuration = 3;
         self.delayBetweenPulseCycles = 0;
         self.annotationColor = [UIColor colorWithRed:0.000 green:0.478 blue:1.000 alpha:1];
@@ -172,8 +172,8 @@
         
         CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"opacity"];
         animation.duration = self.outerPulseAnimationDuration;
-        animation.values = @[@0.45, @0.45, @0];
-        animation.keyTimes = @[@0, @0.2, @1];
+        animation.values = @[@0.7, @0.6, @0];
+        animation.keyTimes = @[@0, @0.3, @1];
         animation.removedOnCompletion = NO;
         [animations addObject:animation];
         
@@ -200,10 +200,6 @@
         _whiteDotLayer.position = CGPointMake(self.bounds.size.width/2, self.bounds.size.height/2);
         _whiteDotLayer.contentsGravity = kCAGravityCenter;
         _whiteDotLayer.contentsScale = [UIScreen mainScreen].scale;
-        _whiteDotLayer.shadowColor = [UIColor blackColor].CGColor;
-        _whiteDotLayer.shadowOffset = CGSizeMake(0, 2);
-        _whiteDotLayer.shadowRadius = 3;
-        _whiteDotLayer.shadowOpacity = 0.3;
         _whiteDotLayer.shouldRasterize = YES;
         _whiteDotLayer.rasterizationScale = [UIScreen mainScreen].scale;
     }
@@ -213,45 +209,12 @@
 - (CALayer*)colorDotLayer {
     if(!_colorDotLayer) {
         _colorDotLayer = [CALayer layer];
-        CGFloat width = self.bounds.size.width-6;
+        CGFloat width = self.bounds.size.width-4;
         _colorDotLayer.bounds = CGRectMake(0, 0, width, width);
         _colorDotLayer.allowsGroupOpacity = YES;
         _colorDotLayer.backgroundColor = self.annotationColor.CGColor;
         _colorDotLayer.cornerRadius = width/2;
         _colorDotLayer.position = CGPointMake(self.bounds.size.width/2, self.bounds.size.height/2);
-        
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-            
-            if(self.delayBetweenPulseCycles != INFINITY) {
-                CAMediaTimingFunction *defaultCurve = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionDefault];
-
-                CAAnimationGroup *animationGroup = [CAAnimationGroup animation];
-                animationGroup.duration = self.pulseAnimationDuration;
-                animationGroup.repeatCount = INFINITY;
-                animationGroup.removedOnCompletion = NO;
-                animationGroup.autoreverses = YES;
-                animationGroup.timingFunction = defaultCurve;
-                animationGroup.speed = 1;
-                animationGroup.fillMode = kCAFillModeBoth;
-
-                CABasicAnimation *pulseAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale.xy"];
-                pulseAnimation.fromValue = @0.8;
-                pulseAnimation.toValue = @1;
-                pulseAnimation.duration = self.pulseAnimationDuration;
-                
-                CABasicAnimation *opacityAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
-                opacityAnimation.fromValue = @0.8;
-                opacityAnimation.toValue = @1;
-                opacityAnimation.duration = self.pulseAnimationDuration;
-                
-                animationGroup.animations = @[pulseAnimation, opacityAnimation];
-
-                dispatch_async(dispatch_get_main_queue(), ^(void) {
-                    [_colorDotLayer addAnimation:animationGroup forKey:@"pulse"];
-                });
-            }
-        });
-
     }
     return _colorDotLayer;
 }
